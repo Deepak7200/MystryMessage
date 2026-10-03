@@ -11,14 +11,14 @@ export async function POST(request: Request){
         const decodedUsername = decodeURIComponent(username)
         const user = await UserModel.findOne({username: decodedUsername})
 
-        if(!user){
+        if (!user) {
             return Response.json(
                 {
                     success: false,
                     message: "User not found"
                 },
-                {status: 500}
-            )
+                { status: 404 }
+            );
         }
 
         const isCodeValid = user.verifyCode === code
@@ -53,15 +53,16 @@ export async function POST(request: Request){
             )   
         }
 
-    } catch (error){
-        console.error("Error verifying user", error);
+    } catch (error) {
+        console.error("Error verifying user:", error);
+
         return Response.json(
             {
                 success: false,
-                message: "Error verifying user"
+                message: error instanceof Error ? error.message : "Error verifying user"
             },
-            {status: 500}
-        )
+            { status: 500 }
+        );
     }
 }
 
